@@ -14,7 +14,7 @@
     if ($metodo == 'GET') {
         try {
             if ($idUsuario) {
-                $query = "SELECT * FROM usuarios WHERE idUsuario = ?";
+                $query = "SELECT * FROM usuarios WHERE id = ?";
                 $consulta = $conexion->prepare($query);
                 $consulta->execute([$idUsuario]);
                 $datos = $consulta->fetch(PDO::FETCH_ASSOC);
