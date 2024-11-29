@@ -52,7 +52,7 @@
                 $respuesta = formatearRespuesta(false, 'Error de base de datos: ' . $e->getMessage());
             }
         } else {
-            $respuesta = formatearRespuesta(false, 'Faltan campos obligatorios.');
+            $respuesta = formatearRespuesta(false, 'Faltan datos en el formulario. Asegúrate de incluir todos los campos necesarios.');
         }
     } else {
         $respuesta = formatearRespuesta(false, 'Método no permitido. Se esperaba POST.');

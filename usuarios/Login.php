@@ -28,7 +28,7 @@
                 $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
 
                 if ($usuario && password_verify($contra, $usuario['contra'])) {
-                    unset($usuario['contra']); //quita la contraseña de la respuesta
+                    unset($usuario['contra']);
 
                     $respuesta = formatearRespuesta(true, 'Login exitoso', $usuario);
                 } else {

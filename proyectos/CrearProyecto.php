@@ -14,17 +14,15 @@ if ($metodo == 'POST') {
     $datos = json_decode($contenido, true);
     
         try {
-                if (isset($datos['nombre'], $datos['descripcion'], $datos['fechaInicio'], $datos['fechaFin'], $datos['cantPersonas'], $datos['cantTareas'], $datos['instructor_id']) ) {
+                if (isset($datos['nombre'], $datos['descripcion'], $datos['fechaInicio'], $datos['fechaFin'], $datos['idInstructor']) ) {
                     $nombre = $datos['nombre'];
                     $descripcion = $datos['descripcion'];
                     $fechaInicio = $datos['fechaInicio'];
                     $fechaFin = $datos['fechaFin'];
-                    $cantPersonas = $datos['cantPersonas'];
-                    $cantTareas = $datos['cantTareas'];
-                    $idInstructor = $datos['instructor_id'];
+                    $idInstructor = $datos['idInstructor'];
 
-                    $query = "INSERT INTO proyectos (instructor_id, nombre, descripcion, fechaInicio, fechaFin, cantPersonas, cantTareas) 
-                            VALUES (:idI, :nombre, :descripcion, :fechaInicio, :fechaFin, :cantPersonas, :cantTareas)";
+                    $query = "INSERT INTO proyectos (idInstructor, nombre, descripcion, fechaInicio, fechaFin)
+                            VALUES (:idI, :nombre, :descripcion, :fechaInicio, :fechaFin)";
                     $consulta = $conexion->prepare($query);
 
                     $consulta->bindParam(':idI', $idInstructor);
@@ -32,8 +30,6 @@ if ($metodo == 'POST') {
                     $consulta->bindParam(':descripcion', $descripcion);
                     $consulta->bindParam(':fechaInicio', $fechaInicio);
                     $consulta->bindParam(':fechaFin', $fechaFin);
-                    $consulta->bindParam(':cantPersonas', $cantPersonas);
-                    $consulta->bindParam(':cantTareas', $cantTareas);
 
                     if ($consulta->execute()) {
                         $respuesta = formatearRespuesta(true, 'Proyecto creado correctamente.');
@@ -41,7 +37,7 @@ if ($metodo == 'POST') {
                         $respuesta = formatearRespuesta(false, 'No se pudo crear el proyecto. Verifica los datos y vuelve a intentarlo.');
                     }
                 } else {
-                    $respuesta = formatearRespuesta(false, 'Faltan datos en el formulario.');
+                    $respuesta = formatearRespuesta(false, 'Faltan datos en el formulario. Asegúrate de incluir todos los campos necesarios.');
                 }
         } catch (Exception $e) {
             $respuesta = formatearRespuesta(false, 'Error de base de datos: ' . $e->getMessage());
