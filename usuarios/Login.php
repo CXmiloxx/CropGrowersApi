@@ -1,10 +1,9 @@
 <?php
     include './server/conexion.php';
+    include './server/Token.php';
 
-    header("Content-Type: application/json");
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: POST");
-    header("Access-Control-Allow-Headers: Content-Type");
+
+    configurarHeaders();
 
     $metodo = $_SERVER['REQUEST_METHOD'];
 
@@ -22,17 +21,23 @@
             }
 
             try {
-                $consultaUsuario = $conexion->prepare("SELECT * FROM usuarios WHERE correo = :cor");
+                $consultaUsuario = $conexion->prepare("SELECT id, contra, nombre, rol FROM usuarios WHERE correo = :cor");
                 $consultaUsuario->bindParam(':cor', $correo);
                 $consultaUsuario->execute();
                 $usuario = $consultaUsuario->fetch(PDO::FETCH_ASSOC);
 
-                if ($usuario && password_verify($contra, $usuario['contra'])) {
-                    unset($usuario['contra']);
-
-                    $respuesta = formatearRespuesta(true, 'Login exitoso', $usuario);
+                if ($usuario) {
+                    if (password_verify($contra, $usuario['contra'])) {
+                        unset($usuario['contra']);
+                        
+                        $token = Token::createToken($correo, $usuario['id'],$usuario['rol']);
+                        
+                        $respuesta = formatearRespuesta(true, 'Login exitoso', null ,$token);
+                    } else {
+                        $respuesta = formatearRespuesta(false, 'Contraseña incorrecta.');
+                    }
                 } else {
-                    $respuesta = formatearRespuesta(false, 'Correo o contraseña incorrectos.');
+                    $respuesta = formatearRespuesta(false, 'El correo que ingresaste no esta registrado.');
                 }
             } catch (PDOException $e) {
                 $respuesta = formatearRespuesta(false, 'Error en la base de datos: ' . $e->getMessage());
