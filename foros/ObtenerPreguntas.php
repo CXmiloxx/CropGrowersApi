@@ -1,34 +1,46 @@
 <?php
-    include './server/conexion.php';
-    configurarHeaders();
+include './server/conexion.php';
+configurarHeaders();
 
-    $metodo = $_SERVER['REQUEST_METHOD'];
-    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $segmentos_uri = explode('/', $uri);
-    $idProyecto = isset($segmentos_uri[3]) && is_numeric($segmentos_uri[3])? $segmentos_uri[3] : null;
+$metodo = $_SERVER['REQUEST_METHOD'];
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$segmentos_uri = explode('/', $uri);
+$idProyecto = isset($segmentos_uri[3]) && is_numeric($segmentos_uri[3]) ? $segmentos_uri[3] : null;
 
-    if ($metodo == 'GET') {
-        try {
-            if ($idProyecto) {
-                $query = 'SELECT * FROM foros WHERE idProyecto = ?';
-                $consulta = $conexion->prepare($query);
-                $consulta->execute([$idProyecto]);
-                $datos = $consulta->fetchAll(PDO::FETCH_ASSOC);
+if ($metodo == 'GET') {
+    try {
+        if ($idProyecto) {
+            $query = 'SELECT f.*, r.id AS idRespuesta, r.contenido AS respuestaContenido
+                        FROM foros f
+                        LEFT JOIN respuestas r ON f.id = r.idForo
+                        WHERE f.idProyecto = ?';
+            $consulta = $conexion->prepare($query);
+            $consulta->execute([$idProyecto]);
+            $datos = $consulta->fetchAll(PDO::FETCH_ASSOC);
 
-                if ($datos) {
-                    $respuesta = formatearRespuesta(true, "Foros obtenidos exitosamente", $datos);
-                } else {
-                    $respuesta = formatearRespuesta(false, "No se encontró ningún foro con el proyecto especificado.");
+            $foros = [];
+            foreach ($datos as $fila) {
+                $idForo = $fila['id'];
+                if (!isset($foros[$idForo])) {
+                    $foros[$idForo] = [
+                        'id' => $fila['id'],
+                        'contenido' => $fila['contenido'],
+                        'respuestas' => [],
+                    ];
                 }
-            }else{
-                $respuesta = formatearRespuesta(false, "Debes de tener un ID especificado.");
+                if ($fila['idRespuesta']) {
+                    $foros[$idForo]['respuestas'][] = [
+                        'id' => $fila['idRespuesta'],
+                        'contenido' => $fila['respuestaContenido'],
+                    ];
+                }
             }
-        }catch (Exception $e) {
-            $respuesta = formatearRespuesta(false, "Error al conectar con la base de datos: ". $e->getMessage());
+            $respuesta = formatearRespuesta(true, "Foros obtenidos exitosamente", array_values($foros));
+        } else {
+            $respuesta = formatearRespuesta(false, "Debes de tener un ID especificado.");
         }
-    }else{
-        $respuesta = formatearRespuesta(false, "Método no permitido. Se esperaba GET.");
+    } catch (Exception $e) {
+        $respuesta = formatearRespuesta(false, "Error al conectar con la base de datos: " . $e->getMessage());
     }
-    
     echo json_encode($respuesta);
-?>
+}

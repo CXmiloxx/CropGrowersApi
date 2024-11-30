@@ -14,13 +14,13 @@
                 $contenido = trim(file_get_contents('php://input'));
                 $datos = json_decode($contenido, true);
                 
-                if (isset($datos['idUsuario'], $datos['contendido'] ) ) {
+                if (isset($datos['idUsuario'], $datos['contenido'] ) ) {
 
                     $idUsuario = $datos['idUsuario'];
                     $contenido = $datos['contenido'];
                     $fecha_actual = date("Y-m-d H:i:s");
                     
-                    $query = "INSERT INTO foros (idForo, idUsuario, contenido, fecha)
+                    $query = "INSERT INTO respuestas (idForo, idUsuario, contenido, fecha)
                                 VALUES (:idF,:idU, :con, :fec)";
                                 
                     $consulta = $conexion->prepare($query);
