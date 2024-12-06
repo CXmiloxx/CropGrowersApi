@@ -11,7 +11,7 @@
     if ($metodo == 'DELETE') {
         try {
             if ($idProyecto) {
-                $query = "DELETE FROM proyectos WHERE idPproyecto = ?";
+                $query = "DELETE FROM proyectos WHERE id = ?";
                 $consulta = $conexion->prepare($query);
                 $consulta->execute([$idProyecto]);
 

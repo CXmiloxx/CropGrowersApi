@@ -19,7 +19,7 @@
                 $descripcion = $datos['descripcion'];
                 $fechaLimite = $datos['fechaLimite'];
 
-                $query = "INSERT INTO tareas (IdProyecto, nombre, descripcion, fechaLimite) VALUES (:idI, :nom, :des, :fecL)";
+                $query = "INSERT INTO tareas (idProyecto, nombre, descripcion, fechaLimite) VALUES (:idI, :nom, :des, :fecL)";
                 $consulta = $conexion->prepare($query);
                 $consulta->bindParam(':idI', $idProyecto);
                 $consulta->bindParam(':nom', $nombre);

@@ -13,27 +13,52 @@
             $contenido = trim(file_get_contents('php://input'));
             $datos = json_decode($contenido, true);
             
-            if (isset($datos['idUsuario'], $datos['estado'], $datos['comentarios'] ) ) {
+            if (isset($datos['idUsuario'], $datos['estado'], $datos['comentarios']) ) {
                 $idUsuario = $datos['idUsuario'];
                 $estado = $datos['estado'];
                 $comentarios = $datos['comentarios'];
-
-                $query = "INSERT INTO estadoTareas (idTarea, idUsuario, estado, comentarios) VALUES (:idT, :idU, :est, :com)";
+            
+                // mirar si existe un estado para esta tarea y usuario
+                $query = "SELECT id FROM estadoTareas WHERE idTarea = :idTarea AND idUsuario = :idUsuario";
                 $consulta = $conexion->prepare($query);
-                $consulta->bindParam(':idT', $idTarea);
-                $consulta->bindParam(':idU', $idUsuario);
-                $consulta->bindParam(':est', $estado);
-                $consulta->bindParam(':com', $comentarios);
-                
-                if ($consulta->execute()) {
-                    $respuesta = formatearRespuesta(true, 'Tarea creada correctamente.');
+                $consulta->bindParam(':idTarea', $idTarea);
+                $consulta->bindParam(':idUsuario', $idUsuario);
+                $consulta->execute();
+            
+                if ($consulta->rowCount() > 0) {
+                    // Si existe se actualiza el estado
+                    $updateQuery = "UPDATE estadoTareas SET estado = :estado, comentarios = :com WHERE idTarea = :idTarea AND idUsuario = :idUsuario";
+                    $updateConsulta = $conexion->prepare($updateQuery);
+                    $updateConsulta->bindParam(':com', $datos['comentarios']);
+                    $updateConsulta->bindParam(':estado', $estado);
+                    $updateConsulta->bindParam(':idTarea', $idTarea);
+                    $updateConsulta->bindParam(':idUsuario', $idUsuario);
 
-                }else{
-                    $respuesta = formatearRespuesta(false, 'No se pudo crear la tarea. Verifica los datos y vuelve a intentarlo.');
+            
+                    if ($updateConsulta->execute()) {
+                        $respuesta = formatearRespuesta(true, 'Estado actualizado correctamente.');
+                    } else {
+                        $respuesta = formatearRespuesta(false, 'No se pudo actualizar el estado.');
+                    }
+                } else {
+                    // Si no existe se ineserta un nuevo estado
+                    $insertQuery = "INSERT INTO estadoTareas (idTarea, idUsuario, estado, comentarios) VALUES (:idTarea, :idUsuario, :estado, :com)";
+                    $insertConsulta = $conexion->prepare($insertQuery);
+                    $insertConsulta->bindParam(':idTarea', $idTarea);
+                    $insertConsulta->bindParam(':idUsuario', $idUsuario);
+                    $insertConsulta->bindParam(':estado', $estado);
+                    $insertConsulta->bindParam(':com', $comentarios);
+            
+                    if ($insertConsulta->execute()) {
+                        $respuesta = formatearRespuesta(true, 'Estado creado correctamente.');
+                    } else {
+                        $respuesta = formatearRespuesta(false, 'No se pudo crear el estado.');
+                    }
                 }
-            }else{
-                $respuesta = formatearRespuesta(false, 'Faltan datos en el formulario. Asegúrate de incluir todos los campos necesarios.');
+            } else {
+                $respuesta = formatearRespuesta(false, 'Faltan datos necesarios.');
             }
+            
         }catch(Exception $e){
             $respuesta = formatearRespuesta(false, 'Error de base de datos: '. $e->getMessage());
         }
