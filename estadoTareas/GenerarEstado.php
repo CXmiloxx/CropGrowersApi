@@ -13,10 +13,9 @@
             $contenido = trim(file_get_contents('php://input'));
             $datos = json_decode($contenido, true);
             
-            if (isset($datos['idUsuario'], $datos['estado'], $datos['comentarios']) ) {
+            if (isset($datos['idUsuario'], $datos['estado']) ) {
                 $idUsuario = $datos['idUsuario'];
                 $estado = $datos['estado'];
-                $comentarios = $datos['comentarios'];
             
                 // mirar si existe un estado para esta tarea y usuario
                 $query = "SELECT id FROM estadoTareas WHERE idTarea = :idTarea AND idUsuario = :idUsuario";
@@ -27,9 +26,8 @@
             
                 if ($consulta->rowCount() > 0) {
                     // Si existe se actualiza el estado
-                    $updateQuery = "UPDATE estadoTareas SET estado = :estado, comentarios = :com WHERE idTarea = :idTarea AND idUsuario = :idUsuario";
+                    $updateQuery = "UPDATE estadoTareas SET estado = :estado WHERE idTarea = :idTarea AND idUsuario = :idUsuario";
                     $updateConsulta = $conexion->prepare($updateQuery);
-                    $updateConsulta->bindParam(':com', $datos['comentarios']);
                     $updateConsulta->bindParam(':estado', $estado);
                     $updateConsulta->bindParam(':idTarea', $idTarea);
                     $updateConsulta->bindParam(':idUsuario', $idUsuario);
@@ -42,12 +40,11 @@
                     }
                 } else {
                     // Si no existe se ineserta un nuevo estado
-                    $insertQuery = "INSERT INTO estadoTareas (idTarea, idUsuario, estado, comentarios) VALUES (:idTarea, :idUsuario, :estado, :com)";
+                    $insertQuery = "INSERT INTO estadoTareas (idTarea, idUsuario, estado) VALUES (:idTarea, :idUsuario, :estado)";
                     $insertConsulta = $conexion->prepare($insertQuery);
                     $insertConsulta->bindParam(':idTarea', $idTarea);
                     $insertConsulta->bindParam(':idUsuario', $idUsuario);
                     $insertConsulta->bindParam(':estado', $estado);
-                    $insertConsulta->bindParam(':com', $comentarios);
             
                     if ($insertConsulta->execute()) {
                         $respuesta = formatearRespuesta(true, 'Estado creado correctamente.');
