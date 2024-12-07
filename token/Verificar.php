@@ -18,7 +18,7 @@
             $decodedToken = Token::validateToken($token);
 
             if ($decodedToken['valid']) {
-                $respuesta = formatearRespuesta(true, 'Token válido',["data" => ["correo" => $decodedToken['correo'], "id" => $decodedToken['id'], "rol" =>$decodedToken['rol'] ] ] );
+                $respuesta = formatearRespuesta(true, 'Token válido',["data" => ["correo" => $decodedToken['correo'], "id" => $decodedToken['id'], "rol" =>$decodedToken['rol'], "nombre" =>$decodedToken['nombre'] ] ] );
             } else {
                 $respuesta = formatearRespuesta(false, 'Token inválido');
             }

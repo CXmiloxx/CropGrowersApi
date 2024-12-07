@@ -30,7 +30,7 @@
                     if (password_verify($contra, $usuario['contra'])) {
                         unset($usuario['contra']);
                         
-                        $token = Token::createToken($correo, $usuario['id'],$usuario['rol']);
+                        $token = Token::createToken($correo, $usuario['id'], $usuario['rol'], $usuario['nombre']);
                         
                         $respuesta = formatearRespuesta(true, 'Login exitoso', null ,$token);
                     } else {

@@ -5,11 +5,12 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 class Token {
-    public static function createToken($correo, $id, $rol) {
+    public static function createToken($correo, $id, $rol, $nombre) {
         $payload = array(
             "correo" => $correo,
             "id" => $id,
             "rol" => $rol,
+            "nombre" => $nombre,
             "iat" => time(),
             "exp" => time() + (30 * 24 * 60 * 60)
         );
@@ -27,12 +28,14 @@ class Token {
             $id = $decoded->id;
             $correo = $decoded->correo;
             $rol = $decoded->rol;
+            $nombre = $decoded->nombre;
 
             return [
                 "valid" => true,
                 "id" => $id,
                 "correo" => $correo,
-                "rol" => $rol
+                "rol" => $rol,
+                "nombre" => $nombre,
             ];
         } catch (\Exception $e) {
             return [
