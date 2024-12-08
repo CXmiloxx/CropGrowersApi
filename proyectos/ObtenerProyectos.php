@@ -11,27 +11,29 @@ configurarHeaders();
 if ($metodo === 'GET') {
     try {
         if ($idUsuario) {
-            $query = 'SELECT p.*, u.nombre, u.apellido
-                        FROM proyectos p
-                        INNER JOIN usuarios u ON p.idInstructor = u.id 
-                        WHERE p.idInstructor = ?';
+            $query = 'SELECT p.*,
+                    u.nombre AS nombreUsuario,
+                    u.apellido AS apellidoUsuario
+                    FROM proyectos p
+                    INNER JOIN usuarios u ON p.idInstructor = u.id
+                    WHERE p.idInstructor = ?';
             $consulta = $conexion->prepare($query);
             $consulta->execute([$idUsuario]);
             $datos = $consulta->fetchAll(PDO::FETCH_ASSOC);
-
+        
             if ($datos) {
                 $respuesta = formatearRespuesta(true, "Proyectos obtenidos correctamente", $datos);
             } else {
                 $respuesta = formatearRespuesta(false, "No se encontraron proyectos para el ID proporcionado.");
             }
         } else {
-            $query = 'SELECT p.*, u.nombre, u.apellido 
+            $query = 'SELECT p.*, u.nombre AS nombreUsuario, u.apellido AS apellidoUsuario
                         FROM proyectos p
                         INNER JOIN usuarios u ON p.idInstructor = u.id';
             $consulta = $conexion->prepare($query);
             $consulta->execute();
             $datos = $consulta->fetchAll(PDO::FETCH_ASSOC);
-
+        
             if ($datos) {
                 $respuesta = formatearRespuesta(true, "Proyectos obtenidos correctamente", $datos);
             } else {
