@@ -5,10 +5,10 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-$host = 'b0monyi56lgjfo5zanjk-mysql.services.clever-cloud.com';
-$bdname = 'b0monyi56lgjfo5zanjk';
-$user = 'uaektswceptis4gv';
-$password = 'lTV3kI7uS1zsAZddhWmD';
+$host = 'b6qkhpc2m5e8ouerlzpv-mysql.services.clever-cloud.com';
+$bdname = 'b6qkhpc2m5e8ouerlzpv';
+$user = 'ujuih3xrmk2lv7zk';
+$password = 'VHB5B9CkSY5PGS2Nb8qc';
 
 try {
 

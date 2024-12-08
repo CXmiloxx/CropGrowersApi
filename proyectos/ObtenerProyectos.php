@@ -6,15 +6,15 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $segmentos_uri = explode('/', $uri);
 $idUsuario = isset($segmentos_uri[3]) && is_numeric($segmentos_uri[3]) ? $segmentos_uri[3] : null;
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header("Content-Type: application/json");
+configurarHeaders();
 
 if ($metodo === 'GET') {
     try {
         if ($idUsuario) {
-            $query = 'SELECT * FROM proyectos WHERE idInstructor = ?';
+            $query = 'SELECT p.*, u.nombre, u.apellido
+                        FROM proyectos p
+                        INNER JOIN usuarios u ON p.idInstructor = u.id 
+                        WHERE p.idInstructor = ?';
             $consulta = $conexion->prepare($query);
             $consulta->execute([$idUsuario]);
             $datos = $consulta->fetchAll(PDO::FETCH_ASSOC);
@@ -25,11 +25,13 @@ if ($metodo === 'GET') {
                 $respuesta = formatearRespuesta(false, "No se encontraron proyectos para el ID proporcionado.");
             }
         } else {
-            $query = 'SELECT * FROM proyectos';
+            $query = 'SELECT p.*, u.nombre, u.apellido 
+                        FROM proyectos p
+                        INNER JOIN usuarios u ON p.idInstructor = u.id';
             $consulta = $conexion->prepare($query);
             $consulta->execute();
             $datos = $consulta->fetchAll(PDO::FETCH_ASSOC);
-            
+
             if ($datos) {
                 $respuesta = formatearRespuesta(true, "Proyectos obtenidos correctamente", $datos);
             } else {
